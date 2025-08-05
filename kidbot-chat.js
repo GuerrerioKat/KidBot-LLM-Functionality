@@ -5,6 +5,7 @@ const recognizer = SpeechRecognition ? new SpeechRecognition() : null;
 
 if (recognizer) {
   recognizer.lang = 'en-US';
+  recognizer.continuous = true;
   recognizer.interimResults = false;   // we only need the final string
   recognizer.maxAlternatives = 1;
 } else {
@@ -30,6 +31,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // micBtn.addEventListener('pointerup',    () => recognizer.stop());
         // micBtn.addEventListener('pointerleave', () => recognizer.stop());
 
+        try {
+          recognizer.start();            // ask for mic permission & start listening
+          console.log('[KidBot] recognizer.start() — hands-free mode');
+          out.innerText = '🎤 Listening…';
+        } catch (err) {
+            // Chrome throws InvalidStateError if start is called while already active
+            console.warn('[KidBot] recognizer already active', err);
+        }
+
+        let lastTranscript = '';
+
+        recognizer.addEventListener('result', ev => {
+          const res = ev.results[ev.resultIndex];
+          if (!res.isFinal) return;
+
+          const transcript = res[0].transcript.trim();
+          if (!transcript || transcript === lastTranscript) return;
+          console.log('[KidBot] Transcript:', transcript); // print out the transcript
+          if (out) out.innerText = `🗣 You said: “${transcript}”`;
+
+          lastTranscript = transcript;
+          inputEl.value  = transcript;
+          sendToKidbot();
+        });
+
+        recognizer.addEventListener('end', () => {
+          console.log('[KidBot] recognizer ended — restarting');
+          try { recognizer.start(); } catch (_) { /* ignore double-starts */ }
+        });
+        
         micBtn.addEventListener('click', () => {
             recognizer.start();
             console.log('[KidBot] recognizer.start()');
@@ -40,22 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[KidBot] speechend — stopping recognizer');
             recognizer.stop();
         });
-
-        recognizer.addEventListener('result', (ev) => {
-            const transcript = ev.results[0][0].transcript;
-            inputEl.value = transcript;
-            
-            console.log('[KidBot] Transcript:', transcript); // print out the transcript
-            if (out) out.innerText = `🗣 You said: “${transcript}”`;
-            
-            sendToKidbot();
-        });
-
-        // Tell me whne the recognizer ends
-        recognizer.addEventListener('end', () => {
-            console.log('[KidBot] recognizer ended');
-        });
-        
+       
         //Tell me if there's an error
         recognizer.addEventListener('error', (e) =>
             console.error('[KidBot] recognizer error:', e.error)
@@ -100,7 +116,7 @@ async function sendToKidbot() {
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioUrl);
     audio.play();
-  }
+ }
 
 
   const inputEl = document.getElementById('kidbot-input');
