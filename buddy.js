@@ -15,10 +15,6 @@ if (recognizer) {
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('buddy-toggle');
     const popup = document.getElementById('buddy-popup');
-        
-    // Voice synthesis setup
-    const synth = window.speechSynthesis;
-    let buddyVoice = null;
     
     // Highlighter cursor setup
     let highlighterCursor = null;
@@ -29,55 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let characterItems = null;
     let accessoryItems = null;
     
-    // Initialize voice settings
-    function initVoice() {
-        if (!synth) return;
-        
-        
-        const voices = synth.getVoices();
-        // Try to find a friendly voice, prefer female voices for Buddy
-        buddyVoice = voices.find(voice => 
-            voice.name.includes('Female') || 
-            voice.name.includes('Samantha') || 
-            voice.name.includes('Karen') ||
-            voice.name.includes('Zira')
-        ) || voices[0];
-        
-  
-    }
+    //  ----------------- BEGIN KATHERINE CODE  -----------------
     
-    // Speak text function - simple and direct
-    function speakText(text) {
-        if (!synth || !text) return;
-        
-        // BACKEND DEVS: LOG VOICE USAGE FOR ANALYTICS? 
-        
-        // Cancel any ongoing speech
-        synth.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Configure voice settings
-        if (buddyVoice) {
-            utterance.voice = buddyVoice;
-        }
-        
-        //BACKEND DEVS: LOAD USER'S VOICE PREFERENCES FROM DATABASE
-        
-        utterance.rate = 0.9; // Slightly slower for clarity
-        utterance.pitch = 1.1; // Slightly higher for friendliness
-        utterance.volume = 0.8; // Not too loud
-        
-        // Speak the text
-        synth.speak(utterance);
-    }
     
-    // Initialize voices when available
-    if (synth) {
-        initVoice();
-        // Voices might not be loaded immediately
-        synth.onvoiceschanged = initVoice;
-    }
+
+
+    // ----------------- END KATHERINE CODE  -----------------
     
     if (toggleButton && popup) {
         toggleButton.addEventListener('click', function() {
