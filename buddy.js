@@ -1,4 +1,4 @@
-console.log('[buddy] script loaded');
+console.log('[KidBot] script loaded');
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognizer = SpeechRecognition ? new SpeechRecognition() : null;
@@ -9,17 +9,12 @@ if (recognizer) {
   recognizer.interimResults = false;   // we only need the final string
   recognizer.maxAlternatives = 1;
 } else {
-  console.warn('[buddy] SpeechRecognition not supported in this browser');
+  console.warn('[KidBot] SpeechRecognition not supported in this browser');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('buddy-toggle');
     const popup = document.getElementById('buddy-popup');
-
-    // Chatbot send button for text input
-    const btn = document.getElementById('buddy-send');
-    if (!btn) return console.error('[buddy] send button missing');
-    btn.addEventListener('click', sendTobuddy);
         
     // Voice synthesis setup
     const synth = window.speechSynthesis;
@@ -33,65 +28,55 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cache DOM selectors for performance
     let characterItems = null;
     let accessoryItems = null;
-
-    // Chatbot mic button for voice input
-    const micBtn  = document.getElementById('buddy-mic');
-    const inputEl = document.getElementById('buddy-input');
-    const out = document.getElementById('buddy-response');
-
-    if (micBtn && recognizer) {
-        // micBtn.addEventListener('pointerdown', () => {
-        //     recognizer.start();
-        //     console.log('[buddy] recognizer.start()'); // tell me when the recognizer starts
-        // });
-        // micBtn.addEventListener('pointerup',    () => recognizer.stop());
-        // micBtn.addEventListener('pointerleave', () => recognizer.stop());
-
-        try {
-          recognizer.start();            // ask for mic permission & start listening
-          console.log('[buddy] recognizer.start() — hands-free mode');
-          out.innerText = '🎤 Listening…';
-        } catch (err) {
-            // Chrome throws InvalidStateError if start is called while already active
-            console.warn('[buddy] recognizer already active', err);
-        }
-
-        let lastTranscript = '';
-
-        recognizer.addEventListener('result', ev => {
-          const res = ev.results[ev.resultIndex];
-          if (!res.isFinal) return;
-
-          const transcript = res[0].transcript.trim();
-          if (!transcript || transcript === lastTranscript) return;
-          console.log('[buddy] Transcript:', transcript); // print out the transcript
-          if (out) out.innerText = `🗣 You said: “${transcript}”`;
-
-          lastTranscript = transcript;
-          inputEl.value  = transcript;
-          sendTobuddy();
-        });
-
-        recognizer.addEventListener('end', () => {
-          console.log('[buddy] recognizer ended — restarting');
-          try { recognizer.start(); } catch (_) { /* ignore double-starts */ }
-        });
+    
+    // Initialize voice settings
+    function initVoice() {
+        if (!synth) return;
         
-        micBtn.addEventListener('click', () => {
-            recognizer.start();
-            console.log('[buddy] recognizer.start()');
-            out.innerText = '🎤 Listening…';
-        });
-
-        recognizer.addEventListener('speechend', () => {
-            console.log('[buddy] speechend — stopping recognizer');
-            recognizer.stop();
-        });
-       
-        //Tell me if there's an error
-        recognizer.addEventListener('error', (e) =>
-            console.error('[buddy] recognizer error:', e.error)
-        );
+        
+        const voices = synth.getVoices();
+        // Try to find a friendly voice, prefer female voices for Buddy
+        buddyVoice = voices.find(voice => 
+            voice.name.includes('Female') || 
+            voice.name.includes('Samantha') || 
+            voice.name.includes('Karen') ||
+            voice.name.includes('Zira')
+        ) || voices[0];
+        
+  
+    }
+    
+    // Speak text function - simple and direct
+    function speakText(text) {
+        if (!synth || !text) return;
+        
+        // BACKEND DEVS: LOG VOICE USAGE FOR ANALYTICS? 
+        
+        // Cancel any ongoing speech
+        synth.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Configure voice settings
+        if (buddyVoice) {
+            utterance.voice = buddyVoice;
+        }
+        
+        //BACKEND DEVS: LOAD USER'S VOICE PREFERENCES FROM DATABASE
+        
+        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.pitch = 1.1; // Slightly higher for friendliness
+        utterance.volume = 0.8; // Not too loud
+        
+        // Speak the text
+        synth.speak(utterance);
+    }
+    
+    // Initialize voices when available
+    if (synth) {
+        initVoice();
+        // Voices might not be loaded immediately
+        synth.onvoiceschanged = initVoice;
     }
     
     if (toggleButton && popup) {
@@ -263,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     // Main menu - BACKEND DEVS: PERSONALIZE THIS!
-                    // speakText(`Hey ${buddyUserData.userName}! I'm buddy and I'm here to read with you.`);
-                    speakText("Hey, I'm buddy! I am here to read with you. How can I help you?");
+                    // speakText(`Hey ${buddyUserData.userName}! I'm Buddy and I'm here to read with you.`);
+                    speakText("Hey, I'm Buddy! I am here to read with you. How can I help you?");
                 }
             }
         }
@@ -431,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (speechBubble && optionsContainer) {
             // Restore original message
-            speechBubble.innerHTML = 'Hey, I\'m buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>';
+            speechBubble.innerHTML = 'Hey, I\'m Buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>';
             
             // Show options
             optionsContainer.style.display = 'flex';
@@ -542,8 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find and make sentences clickable
         makeSentencesClickable();
         
-        // Update buddy interface
-        updatebuddyForSentenceSelection();
+        // Update Buddy interface
+        updateBuddyForSentenceSelection();
     }
 
     // Function to find sentences on current page
@@ -615,8 +600,8 @@ document.addEventListener('DOMContentLoaded', function() {
             timestamp: Date.now()
         };
         
-        // Update buddy interface
-        updatebuddyWithSelection(currentSentenceSelection);
+        // Update Buddy interface
+        updateBuddyWithSelection(currentSentenceSelection);
     }
 
     // Function to clear sentence selection
@@ -639,16 +624,16 @@ document.addEventListener('DOMContentLoaded', function() {
         sentenceClickHandlers = [];
     }
 
-    // Function to update buddy interface for sentence selection
-    function updatebuddyForSentenceSelection() {
+    // Function to update Buddy interface for sentence selection
+    function updateBuddyForSentenceSelection() {
         const speechBubble = getCachedElement('speechBubble', '.buddy-speech-bubble');
         if (speechBubble) {
             speechBubble.innerHTML = '<button class="buddy-back-btn">←</button>Highlight the sentence that you need help with or use the microphone to speak <button class="buddy-speaker-btn">🔊</button>';
         }
     }
 
-    // Function to update buddy with selection
-    function updatebuddyWithSelection(selectionData) {
+    // Function to update Buddy with selection
+    function updateBuddyWithSelection(selectionData) {
         const speechBubble = getCachedElement('speechBubble', '.buddy-speech-bubble');
         if (speechBubble) {
             speechBubble.innerHTML = `
@@ -1260,19 +1245,17 @@ document.addEventListener('DOMContentLoaded', function() {
             closePopup();
         }
     });
-
-    
 });
 
-async function sendTobuddy() {
-  console.log('[buddy] sendTobuddy() start');
+async function sendToBuddy() {
+  console.log('[Buddy] sendToBuddy() start');
   
   async function speak(text) {
-    const apiKey = buddyChatSettings.elevenLabsApiKey || 'Not Found';
+    const apiKey = buddyUserData.elevenLabsApiKey || 'Not Found';
     const voiceId = '21m00Tcm4TlvDq8ikWAM';
 
     // --- ADD THIS LINE ---
-    console.log('[buddy] ElevenLabs API Key (first few chars):', apiKey ? apiKey.substring(0, 5) + '...' : 'Not found');
+    console.log('[Buddy] ElevenLabs API Key (first few chars):', apiKey ? apiKey.substring(0, 5) + '...' : 'Not found');
     // --- END ADDITION ---
 
 
@@ -1305,38 +1288,38 @@ async function sendTobuddy() {
 
 
   const inputEl = document.getElementById('buddy-input');
-  if (!inputEl) return console.error('[buddy] input not found');
+  if (!inputEl) return console.error('[Buddy] input not found');
   const question = inputEl.value.trim();
-  console.log('[buddy] Question:', question);
+  console.log('[Buddy] Question:', question);
 
   const out = document.getElementById('buddy-response');
   out.innerText = '⏳ Thinking…';
 
   try {
-    const resp = await fetch(buddyChatSettings.ajaxUrl, {
+    const resp = await fetch(buddyUserData.ajaxUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         action:   'buddy_ask',
         question: question,
-        post_id:  buddyChatSettings.postId
+        post_id:  buddyUserData.postId
       })
     });
-    console.log('[buddy] fetch status', resp.status);
+    console.log('[Buddy] fetch status', resp.status);
     const data = await resp.json();
-    console.log('[buddy] parsed JSON:', data);
+    console.log('[Buddy] parsed JSON:', data);
 
     if (!data.success) {
-      console.warn('[buddy] server error:', data.data);
+      console.warn('[Buddy] server error:', data.data);
       out.innerText = data.data.message || 'Server error';
       return;
     }
 
     out.innerText = data.data.reply;
-    console.log('[buddy] Final answer:', data.data.reply);
+    console.log('[Buddy] Final answer:', data.data.reply);
     speak(data.data.reply);
   } catch (err) {
-    console.error('[buddy] network or parse error:', err);
+    console.error('[Buddy] network or parse error:', err);
     out.innerText = 'Network error – see console';
   }
 }
