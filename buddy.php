@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
 add_action('wp_enqueue_scripts', 'buddy_enqueue_assets');
 function buddy_enqueue_assets() {
 
-  if(!is_user_logged_in()){
-        return; //Does not load CSS/JS if user is not 
-    }
+  // if(!is_user_logged_in()){
+  //       return; //Does not load CSS/JS if user is not 
+  //   }
 
   wp_enqueue_script(
     'buddy-js',
