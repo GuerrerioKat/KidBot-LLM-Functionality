@@ -1,4 +1,4 @@
-console.log('[Buddy] script loaded');
+console.log('[buddy] script loaded');
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognizer = SpeechRecognition ? new SpeechRecognition() : null;
@@ -9,7 +9,7 @@ if (recognizer) {
   recognizer.interimResults = false;   // we only need the final string
   recognizer.maxAlternatives = 1;
 } else {
-  console.warn('[Buddy] SpeechRecognition not supported in this browser');
+  console.warn('[buddy] SpeechRecognition not supported in this browser');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const popup = document.getElementById('buddy-popup');
 
     // Chatbot send button for text input
-    const btn = document.getElementById('Buddy-send');
-    if (!btn) return console.error('[Buddy] send button missing');
-    btn.addEventListener('click', sendToBuddy);
+    const btn = document.getElementById('buddy-send');
+    if (!btn) return console.error('[buddy] send button missing');
+    btn.addEventListener('click', sendTobuddy);
         
     // Voice synthesis setup
     const synth = window.speechSynthesis;
@@ -263,8 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     // Main menu - BACKEND DEVS: PERSONALIZE THIS!
-                    // speakText(`Hey ${buddyUserData.userName}! I'm Buddy and I'm here to read with you.`);
-                    speakText("Hey, I'm Buddy! I am here to read with you. How can I help you?");
+                    // speakText(`Hey ${buddyUserData.userName}! I'm buddy and I'm here to read with you.`);
+                    speakText("Hey, I'm buddy! I am here to read with you. How can I help you?");
                 }
             }
         }
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (speechBubble && optionsContainer) {
             // Restore original message
-            speechBubble.innerHTML = 'Hey, I\'m Buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>';
+            speechBubble.innerHTML = 'Hey, I\'m buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>';
             
             // Show options
             optionsContainer.style.display = 'flex';
@@ -542,8 +542,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find and make sentences clickable
         makeSentencesClickable();
         
-        // Update Buddy interface
-        updateBuddyForSentenceSelection();
+        // Update buddy interface
+        updatebuddyForSentenceSelection();
     }
 
     // Function to find sentences on current page
@@ -615,8 +615,8 @@ document.addEventListener('DOMContentLoaded', function() {
             timestamp: Date.now()
         };
         
-        // Update Buddy interface
-        updateBuddyWithSelection(currentSentenceSelection);
+        // Update buddy interface
+        updatebuddyWithSelection(currentSentenceSelection);
     }
 
     // Function to clear sentence selection
@@ -639,16 +639,16 @@ document.addEventListener('DOMContentLoaded', function() {
         sentenceClickHandlers = [];
     }
 
-    // Function to update Buddy interface for sentence selection
-    function updateBuddyForSentenceSelection() {
+    // Function to update buddy interface for sentence selection
+    function updatebuddyForSentenceSelection() {
         const speechBubble = getCachedElement('speechBubble', '.buddy-speech-bubble');
         if (speechBubble) {
             speechBubble.innerHTML = '<button class="buddy-back-btn">←</button>Highlight the sentence that you need help with or use the microphone to speak <button class="buddy-speaker-btn">🔊</button>';
         }
     }
 
-    // Function to update Buddy with selection
-    function updateBuddyWithSelection(selectionData) {
+    // Function to update buddy with selection
+    function updatebuddyWithSelection(selectionData) {
         const speechBubble = getCachedElement('speechBubble', '.buddy-speech-bubble');
         if (speechBubble) {
             speechBubble.innerHTML = `

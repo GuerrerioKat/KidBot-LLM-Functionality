@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: buddy Chat
- * Description: A chatbot that helps kids understand books.
+ * Description: A chatbot that helps teens and tweens with special needs read books by answering questions about the book, clarifying vocabulary, and providing comprehension support.
  * New Features: Added in voice transcirption so you can talk to the chatbot
- * Version: 1.1.0
+ * Version: 2.0.0
  */
 
 // Prevent direct access
@@ -20,12 +20,12 @@ function buddy_enqueue_assets() {
     }
 
   wp_enqueue_script(
-    'buddy-chat-js',
-    plugin_dir_url(__FILE__) . 'buddy-chat.js',
+    'buddy-js',
+    plugin_dir_url(__FILE__) . 'buddy.js',
     [], '1.0', true
   );
   wp_enqueue_style('buddy-style', plugin_dir_url(__FILE__) . 'buddy.css', [], '1.0');
-  wp_localize_script('buddy-chat-js', 'buddyChatSettings', [
+  wp_localize_script('buddy-js', 'buddyChatSettings', [
     'ajaxUrl' => admin_url('admin-ajax.php'),
     'postId'  => get_the_ID() ?: 0,
     'openaiApiKey' => defined('buddy_OPENAI_API_KEY') ? buddy_OPENAI_API_KEY : '',
@@ -81,30 +81,30 @@ function buddy_inject_js_fallback() {
     $js_fallback_done = true;
     
     echo '<script type="text/javascript">
-        // Buddy Companion JavaScript Fallback Injection
+        // buddy Companion JavaScript Fallback Injection
         document.addEventListener("DOMContentLoaded", function() {
-            // Check if Buddy is already present
+            // Check if buddy is already present
             if (document.getElementById("buddy-root")) {
                 return; // Already exists, no need to inject
             }
             
-            // Create and inject Buddy HTML
+            // Create and inject buddy HTML
             var buddyHTML = `<div id="buddy-root">
                 <button id="buddy-toggle">
                     <div class="buddy-toggle-avatar">
-                        <img src="' . esc_url($avatar_url) . '" alt="Buddy Avatar" width="60" height="60" style="border-radius: 50%;" />
+                        <img src="' . esc_url($avatar_url) . '" alt="buddy Avatar" width="60" height="60" style="border-radius: 50%;" />
                         <button class="buddy-avatar-edit">✏️</button>
                     </div>
-                    <div class="buddy-toggle-text">Ask Buddy ✨</div>
+                    <div class="buddy-toggle-text">Ask buddy ✨</div>
                 </button>
                 <!-- Popup (no backdrop container) -->
                 <div id="buddy-popup">
                     <div class="buddy-avatar">
-                        <img src="' . esc_url($avatar_url) . '" alt="Buddy Avatar" width="80" height="80" style="border-radius: 50%;" />
+                        <img src="' . esc_url($avatar_url) . '" alt="buddy Avatar" width="80" height="80" style="border-radius: 50%;" />
                         <button class="buddy-avatar-edit">✏️</button>
                     </div>
                     <div class="buddy-speech-bubble">
-                        Hey, I\'m Buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>
+                        Hey, I\'m buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>
                     </div>
                     <div class="buddy-options">
                         <button class="buddy-option-btn" data-action="sentence">Help with a sentence</button>
@@ -125,7 +125,7 @@ function buddy_inject_js_fallback() {
             document.body.insertAdjacentHTML("beforeend", buddyHTML);
             
             // Debug log for troubleshooting
-            console.log("Buddy Companion: Injected via JavaScript fallback");
+            console.log("buddy Companion: Injected via JavaScript fallback");
         });
     </script>';
 }
@@ -134,7 +134,7 @@ function buddy_inject_js_fallback() {
 function buddy_output_html() {
     // BACKEND DEVS: ADD USER PERMISSION CHECKS HERE!
     // if (!current_user_can('use_buddy_companion')) { return; }
-    // ALSO CHECK IF USER HAS BUDDY ENABLED IN THEIR SETTINGS
+    // ALSO CHECK IF USER HAS buddy ENABLED IN THEIR SETTINGS
     // if (!get_user_meta(get_current_user_id(), 'buddy_enabled', true)) { return; }
     
     // Global tracking to prevent any duplicates across all hooks
@@ -155,19 +155,19 @@ function buddy_output_html() {
                 echo '<div id="buddy-root">
             <button id="buddy-toggle">
                 <div class="buddy-toggle-avatar">
-                    <img src="' . esc_url($avatar_url) . '" alt="Buddy Avatar" width="60" height="60" style="border-radius: 50%;" />
+                    <img src="' . esc_url($avatar_url) . '" alt="buddy Avatar" width="60" height="60" style="border-radius: 50%;" />
                     <button class="buddy-avatar-edit">✏️</button>
                 </div>
-                <div class="buddy-toggle-text">Ask Buddy ✨</div>
+                <div class="buddy-toggle-text">Ask buddy ✨</div>
             </button>
             <!-- Popup (no backdrop container) -->
             <div id="buddy-popup">
                 <div class="buddy-avatar">
-                    <img src="' . esc_url($avatar_url) . '" alt="Buddy Avatar" width="80" height="80" style="border-radius: 50%;" />
+                    <img src="' . esc_url($avatar_url) . '" alt="buddy Avatar" width="80" height="80" style="border-radius: 50%;" />
                     <button class="buddy-avatar-edit">✏️</button>
                 </div>
                 <div class="buddy-speech-bubble">
-                    Hey, I\'m Buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>
+                    Hey, I\'m buddy! I am here to read with you. How can I help you? <button class="buddy-speaker-btn">🔊</button>
                 </div>
                 <div class="buddy-options">
                     <button class="buddy-option-btn" data-action="sentence">Help with a sentence</button>
@@ -185,7 +185,7 @@ function buddy_output_html() {
           </div>';
           
     // Debug output for troubleshooting
-    echo '<!-- Buddy Companion: Injected via PHP hook -->';
+    echo '<!-- buddy Companion: Injected via PHP hook -->';
 }
 
 // Multiple injection strategies for maximum compatibility
@@ -269,58 +269,6 @@ function buddy_handle_avatar_api(WP_REST_Request $request) {
     //Returns an error response 
     return new WP_REST_Response(array('error' => 'Method not allowed'), 405);
 }
-
-//Created Avatar Datebase
-function buddy_create_user_tables() {
-    global $wpdb;
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $prefs_table = $wpdb->prefix . 'buddy_user_preferences';
-    //Contains user_id and avatar preferences 
-    $sql = "CREATE TABLE $prefs_table (
-        user_id bigint(20) NOT NULL,
-        avatar_character varchar(50) DEFAULT 'sun',
-        avatar_accessories text,
-        PRIMARY KEY (user_id)
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-register_activation_hook(__FILE__, 'buddy_create_user_tables');
-
-
-// Create Q&A table on plugin activation
-register_activation_hook(__FILE__, 'buddy_create_qa_table');
-function buddy_create_qa_table() {
-  global $wpdb;
-  $table_name = $wpdb->prefix . 'buddy_qa_table';
-  $charset_collate = $wpdb->get_charset_collate();
-  $sql = "CREATE TABLE $table_name (
-    id mediumint(9) NOT NULL AUTO_INCREMENT,
-    user_id bigint(20) NOT NULL,
-    book_title varchar(255) DEFAULT '' NOT NULL,
-    page_number int DEFAULT 0 NOT NULL,
-    question text NOT NULL,
-    response text NOT NULL,
-    timestamp datetime DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-  ) $charset_collate;";
-  require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-  dbDelta($sql);
-}
-
-// Save to DB
-  global $wpdb;
-  $table_name = $wpdb->prefix . 'buddy_qa_table';
-  $wpdb->insert($table_name, [
-    'user_id'     => get_current_user_id(), //Not sure if this is correct
-    'book_title'  => 'Test Book', //PLACEHOLDER; FETCH
-    'page_number' => 0, //PLACEHOLDER; FETCH
-    'question'    => $question,
-    'response'    => $reply,
-    'timestamp'   => current_time('mysql')
-  ]);
 
 // The real AJAX handler
 add_action('wp_ajax_buddy_ask',      'buddy_ask');
@@ -454,3 +402,310 @@ function buddy_ask() {
   wp_send_json_success(['reply'=>$reply]);
 
 }
+
+// Function to get current page from pager-active span - THIS IS WHAT YOU CALL
+function get_current_readeezy_page() {
+    $user_id = get_current_user_id();
+    $stored_page = get_user_meta($user_id, 'readeezy_current_page', true);
+    return $stored_page ? intval($stored_page) : 1;
+}
+// Function to get current book title from bookTitle element
+function get_current_book_title() {
+    // This returns the stored book title from user meta
+    // The JavaScript below will capture and store it automatically
+    return get_user_meta(get_current_user_id(), 'readeezy_current_book_title', true) ?: 'Unknown Book';
+}
+// AJAX handler to store the page number
+add_action('wp_ajax_store_current_page', 'store_current_page_handler');
+add_action('wp_ajax_nopriv_store_current_page', 'store_current_page_handler');
+function store_current_page_handler() {
+    $page = intval($_POST['page'] ?? 0);
+    $user_id = get_current_user_id();
+    if ($page > 0) {
+        update_user_meta($user_id, 'readeezy_current_page', $page);
+        update_user_meta($user_id, 'readeezy_page_timestamp', time());
+        wp_send_json_success(['page' => $page, 'user' => $user_id]);
+    } else {
+        wp_send_json_error('Invalid page');
+    }
+}
+// AJAX handler to store book title
+add_action('wp_ajax_store_book_title', 'store_book_title_handler');
+add_action('wp_ajax_nopriv_store_book_title', 'store_book_title_handler');
+function store_book_title_handler() {
+    $title = sanitize_text_field($_POST['title'] ?? '');
+    $user_id = get_current_user_id();
+    if (!empty($title)) {
+        update_user_meta($user_id, 'readeezy_current_book_title', $title);
+        wp_send_json_success(['title' => $title]);
+    } else {
+        wp_send_json_error('Invalid title');
+    }
+}
+// Add JavaScript tracking for page changes
+add_action('wp_head', 'add_readeezy_page_tracker');
+function add_readeezy_page_tracker() {
+    if (is_admin()) return;
+    ?>
+    <script type="text/javascript">
+    // === CONSOLE LOGGING (for debugging) ===
+    console.log(':book: Readeezy Page Tracker: Script loaded');
+    // Function to initialize tracker
+    function initializePageTracker() {
+        var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+        var currentPage = null;
+        // Function to get current page from DOM
+        function getCurrentPageFromDOM() {
+            var pageElement = document.querySelector('span.pager-active[data-page]');
+            if (pageElement) {
+                var page = parseInt(pageElement.getAttribute('data-page'));
+                return page;
+            } else {
+                return null;
+            }
+        }
+        // Function to send page to server
+        function sendPageToServer(pageNumber) {
+            if (pageNumber && pageNumber !== currentPage) {
+                currentPage = pageNumber;
+                // === CONSOLE LOGGING (for debugging) ===
+                console.log(':book: Readeezy Page Tracker: Page changed to', pageNumber);
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=store_current_page&page=' + pageNumber
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // === CONSOLE LOGGING (for debugging) ===
+                    console.log(':book: Readeezy Page Tracker: Server updated successfully');
+                })
+                .catch(error => {
+                    // === CONSOLE LOGGING (for debugging) ===
+                    console.log(':book: Readeezy Page Tracker: Server update failed', error);
+                });
+            }
+        }
+        // Make functions globally available
+        window.getCurrentReadeezyPage = getCurrentPageFromDOM;
+        window.getCurrentStoredPage = function() { return currentPage; };
+        // Initial check
+        var initialPage = getCurrentPageFromDOM();
+        if (initialPage) {
+            sendPageToServer(initialPage);
+        }
+        // Monitor for changes every 3 seconds
+        setInterval(function() {
+            var newPage = getCurrentPageFromDOM();
+            if (newPage && newPage !== currentPage) {
+                sendPageToServer(newPage);
+            }
+        }, 3000);
+        // Monitor for clicks
+        document.addEventListener('click', function(e) {
+            setTimeout(function() {
+                var newPage = getCurrentPageFromDOM();
+                if (newPage && newPage !== currentPage) {
+                    sendPageToServer(newPage);
+                }
+            }, 1000);
+        });
+        // === CONSOLE LOGGING (for debugging) ===
+        console.log(':book: Readeezy Page Tracker: Initialized successfully');
+    }
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePageTracker);
+    } else {
+        initializePageTracker();
+    }
+    // Fallback initialization
+    setTimeout(initializePageTracker, 3000);
+    </script>
+    <script type="text/javascript">
+    // Simple book title tracker - separate from page tracking
+    function captureBookTitle() {
+        var titleElement = document.querySelector('#bookTitle');
+        if (titleElement) {
+            var title = titleElement.textContent.trim();
+            if (title) {
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=store_book_title&title=' + encodeURIComponent(title)
+                });
+            }
+        }
+    }
+    // Capture book title when page loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', captureBookTitle);
+    } else {
+        captureBookTitle();
+    }
+    </script>
+    <?php
+}
+
+add_action("admin_notices", "show_book");
+function show_book() {
+    // Get the current book title to determine which book to load
+    $current_book_title = get_current_book_title();
+    // Find the correct book directory based on the title
+    $book_folder = find_book_folder($current_book_title);
+    if (!$book_folder) {
+        echo '<div class="notice notice-error is-dismissible"><p>Could not find book folder for: ' . esc_html($current_book_title) . '</p></div>';
+        return;
+    }
+    $pages_dir = plugin_dir_path(__FILE__) . '../../themes/readeezy/books/custom/' . $book_folder . '/pages/';
+    $page_files = glob($pages_dir . 'page-*.html', GLOB_NOSORT);
+    // Sort files by filename number to get correct order
+    usort($page_files, function($a, $b) {
+        $numA = (int)preg_replace('/[^0-9]/', '', basename($a));
+        $numB = (int)preg_replace('/[^0-9]/', '', basename($b));
+        return $numA - $numB;
+    });
+    // Page numbering configuration
+    $starting_page = 5;  // First actual story page number
+    $page_increment = 2; // Increment between pages (3, 5, 7, 9, etc.)
+    $all_contents = '';
+    $removeHtml = array("<p>", "</p>");
+    if ($page_files) {
+        foreach ($page_files as $index => $file_path) {
+            // Calculate actual page number based on position in sorted array
+            $actual_page_number = $starting_page + ($index * $page_increment);
+            $contents = file_get_contents($file_path);
+            $contents = str_replace($removeHtml, "", $contents);
+            $contents = str_replace("<h1>","{",$contents);
+            $contents = str_replace("</h1>","}",$contents);
+            //$contents = strip_tags($contents);
+            $all_contents .= "[PAGE " . $actual_page_number . "]" . esc_html($contents) . "[/PAGE " . $actual_page_number . "]<br><br>";
+        }
+    } else {
+        echo '<div class="notice notice-error is-dismissible"><p>No page files found in: ' . esc_html($pages_dir) . '</p></div>';
+    }
+    // echo '<div class="notice notice-success is-dismissible"><p>' . $all_contents . '</p></div>';
+    return $all_contents;
+}
+// Function to find the best matching book folder based on title
+function find_book_folder($book_title) {
+    $custom_dir = plugin_dir_path(__FILE__) . '../../themes/readeezy/books/custom/';
+    // Get all directories in the custom folder
+    $directories = glob($custom_dir . '*', GLOB_ONLYDIR);
+    if (empty($directories)) {
+        return null;
+    }
+    // If book title is "Unknown Book", fall back to first available directory
+    if ($book_title === 'Unknown Book') {
+        return basename($directories[0]);
+    }
+    $best_match = null;
+    $highest_similarity = 0;
+    foreach ($directories as $dir) {
+        $folder_name = basename($dir);
+        // Clean both strings for comparison (lowercase, remove special chars)
+        $clean_title = strtolower(preg_replace('/[^a-z0-9]/', '', $book_title));
+        $clean_folder = strtolower(preg_replace('/[^a-z0-9]/', '', $folder_name));
+        // Check for exact match first
+        if ($clean_title === $clean_folder) {
+            return $folder_name;
+        }
+        // Check if one contains the other
+        if (strpos($clean_title, $clean_folder) !== false || strpos($clean_folder, $clean_title) !== false) {
+            return $folder_name;
+        }
+        // Use similar_text for fuzzy matching
+        similar_text($clean_title, $clean_folder, $similarity);
+        if ($similarity > $highest_similarity) {
+            $highest_similarity = $similarity;
+            $best_match = $folder_name;
+        }
+    }
+    // Return best match if similarity is above threshold (60%), otherwise first directory
+    return ($highest_similarity > 60) ? $best_match : basename($directories[0]);
+} 
+
+//Created Avatar Datebase
+function buddy_create_user_tables() {
+    global $wpdb;
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $prefs_table = $wpdb->prefix . 'buddy_user_preferences';
+    //Contains user_id and avatar preferences 
+    $sql = "CREATE TABLE $prefs_table (
+        user_id bigint(20) NOT NULL,
+        avatar_character varchar(50) DEFAULT 'sun',
+        avatar_accessories text,
+        PRIMARY KEY (user_id)
+    ) $charset_collate;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+register_activation_hook(__FILE__, 'buddy_create_user_tables');
+
+
+// Create Q&A table on plugin activation
+register_activation_hook(__FILE__, 'buddy_create_qa_table');
+function buddy_create_qa_table() {
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'buddy_qa_table';
+  $charset_collate = $wpdb->get_charset_collate();
+  $sql = "CREATE TABLE $table_name (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    user_id bigint(20) NOT NULL,
+    book_title varchar(255) DEFAULT '' NOT NULL,
+    page_number int DEFAULT 0 NOT NULL,
+    question text NOT NULL,
+    response text NOT NULL,
+    timestamp datetime DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+  ) $charset_collate;";
+  require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+  dbDelta($sql);
+}
+
+function getLatestMessages() {
+    session_start(); // Make sure the session is started
+
+    $history = $_SESSION['buddy_history'] ?? [];
+
+    $latestReply = null;
+    $latestQuestion = null;
+
+    // Loop in reverse to find the most recent of each
+    for ($i = count($history) - 1; $i >= 0; $i--) {
+        if ($history[$i]['role'] === 'assistant' && !$latestReply) {
+            $latestReply = $history[$i]['content'];
+        }
+        if ($history[$i]['role'] === 'user' && !$latestQuestion) {
+            $latestQuestion = $history[$i]['content'];
+        }
+        if ($latestReply && $latestQuestion) {
+            break; // Stop early if both are found
+        }
+    }
+
+    return ['reply' => $latestReply, 'question' => $latestQuestion];
+}
+
+
+$latest = getLatestMessages();
+$question = $latest['question'];
+$reply    = $latest['reply'];
+
+// Save to DB
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'buddy_qa_table';
+  $wpdb->insert($table_name, [
+    'user_id'     => get_current_user_id(), //Not sure if this is correct
+    'book_title'  => 'Test Book', //PLACEHOLDER; FETCH
+    'page_number' => 0, //PLACEHOLDER; FETCH
+    'question'    => $question,
+    'response'    => $reply,
+    'timestamp'   => current_time('mysql')
+  ]);
