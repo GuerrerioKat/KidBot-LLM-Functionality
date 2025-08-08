@@ -1,0 +1,765 @@
+#buddy-root {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  #buddy-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+
+  /* Utility Classes */
+  .buddy-transition {
+    transition: all 0.2s ease;
+  }
+  
+  .buddy-hover-scale:hover {
+    transform: scale(1.05);
+  }
+  
+  .buddy-hover-scale-lg:hover {
+    transform: scale(1.1);
+  }
+  
+  .buddy-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .buddy-item-base {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: #f8f9fa;
+  }
+
+  #buddy-toggle:hover {
+    transform: scale(1.05);
+  }
+
+  .buddy-toggle-avatar {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    /* Remove overflow: hidden to prevent clipping the edit button */
+  }
+
+  .buddy-toggle-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .buddy-toggle-text {
+    background: #2196F3;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Backdrop base styles */
+  .buddy-popup-backdrop {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  /* Global backdrop */
+  .buddy-popup-backdrop {
+    position: fixed;
+    pointer-events: auto;
+  }
+
+  /* Image-specific backdrop */
+  .page-img .buddy-popup-backdrop {
+    position: absolute;
+  }
+
+  /* Show states */
+  .buddy-popup-backdrop.show,
+  .page-img .buddy-popup-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #buddy-popup {
+    position: fixed;
+    top: 50%;
+    left: 150px;
+    transform: translateY(-50%);
+    background: transparent;
+    padding: 0;
+    z-index: 9999;
+    width: 300px;
+    max-width: calc(50vw - 50px);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    transform: translateY(-50%) scale(0.8);
+  }
+
+  #buddy-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) scale(1);
+  }
+
+  /* Responsive positioning for mobile */
+  @media (max-width: 768px) {
+    #buddy-popup {
+      left: 20px;
+      right: 20px;
+      max-width: calc(100vw - 40px);
+      transform: translateY(-50%) scale(0.8);
+    }
+    
+    #buddy-popup.show {
+      transform: translateY(-50%) scale(1);
+    }
+  }
+
+  /* Ensure text content remains readable when popup is open */
+  body.buddy-popup-open {
+    overflow: hidden;
+  }
+
+  /* Improve backdrop for better text visibility */
+  .buddy-popup-backdrop.show {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+  }
+
+  /* Sentence highlighting system */
+  .sentence-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+  }
+
+  .sentence-clickable:hover {
+    background-color: rgba(255, 215, 0, 0.3);
+  }
+
+  .sentence-highlight {
+    background-color: #FFD700;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  }
+
+  /* Highlighter mode cursor */
+  body.buddy-highlighter-mode .sentence-clickable {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="4" fill="%23FFD700" rx="2"/></svg>') 10 10, pointer;
+  }
+
+
+  .buddy-avatar {
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 36px;
+    position: relative;
+    /* Remove overflow: hidden and border-radius to prevent clipping the edit button */
+  }
+
+  .buddy-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .buddy-speech-bubble {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    position: relative;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-weight: 500;
+  }
+
+  .buddy-speech-bubble::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+  }
+
+  .buddy-speaker-btn {
+    background: #2196F3;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+  }
+
+  .buddy-speaker-btn:hover {
+    background: #1976D2;
+    transform: scale(1.1);
+  }
+
+  .buddy-back-btn {
+    background: #E0E0E0;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 8px;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    color: #666;
+    font-weight: bold;
+  }
+
+  .buddy-back-btn:hover {
+    background: #BDBDBD;
+    transform: scale(1.1);
+  }
+
+  .buddy-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .buddy-option-btn {
+    background: #E5E5E5;
+    border: none;
+    border-radius: 25px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .buddy-option-btn:hover {
+    background: #D0D0D0;
+  }
+
+  .buddy-option-btn::after {
+    content: '▶';
+    font-size: 14px;
+    color: #666;
+  }
+
+  .buddy-mic-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #2196F3;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .buddy-mic-btn:hover {
+    background: #1976D2;
+    transform: scale(1.05);
+  }
+
+  /* Highlighter cursor */
+  .buddy-highlighter-cursor {
+    position: fixed;
+    width: 20px;
+    height: 4px;
+    background: #FFD700;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 10001;
+    transform: translate(-50%, -50%) rotate(45deg);
+    opacity: 0.8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: opacity 0.1s ease;
+  }
+
+  .buddy-highlighter-cursor::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: #FFD700;
+    border-radius: 3px;
+    opacity: 0.3;
+  }
+
+  /* Body class for highlighter mode - only affects non-book elements */
+
+  /* Only affect Buddy elements, not the entire page */
+  body.buddy-highlighter-mode #buddy-root *,
+  body.buddy-highlighter-mode .buddy-popup *,
+  body.buddy-highlighter-mode .buddy-modal * {
+    cursor: none !important;
+  }
+
+  /* Ensure book content maintains normal cursor and styling */
+  body.buddy-highlighter-mode .book-page-text,
+  body.buddy-highlighter-mode .page-copy,
+  body.buddy-highlighter-mode .page-img,
+  body.buddy-highlighter-mode .tiplit-turn-main,
+  body.buddy-highlighter-mode .tiplit-turn-page,
+  body.buddy-popup-open .book-page-text,
+  body.buddy-popup-open .page-copy,
+  body.buddy-popup-open .page-img,
+  body.buddy-popup-open .tiplit-turn-main,
+  body.buddy-popup-open .tiplit-turn-page {
+    cursor: auto !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    text-align: inherit !important;
+  }
+
+  /* Avatar Edit Button */
+  .buddy-avatar-edit {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #2196F3;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+    padding: 0;
+  }
+
+  .buddy-avatar-edit:hover {
+    background: #f0f8ff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  }
+
+  /* Show edit button on avatar hover */
+  .buddy-toggle-avatar:hover .buddy-avatar-edit,
+  .buddy-avatar:hover .buddy-avatar-edit {
+    opacity: 1;
+  }
+
+  /* Avatar Customization Modal */
+  .buddy-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 20000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .buddy-modal-container {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .buddy-modal-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 16px 0;
+  }
+
+  .buddy-modal-close {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: all 0.2s ease;
+  }
+
+  .buddy-modal-close:hover {
+    background: #e0e0e0;
+    color: #333;
+  }
+
+  .buddy-avatar-preview {
+    padding: 0 24px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .buddy-preview-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .buddy-preview-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .buddy-tab-container {
+    display: flex;
+    margin: 0 24px 24px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 4px;
+  }
+
+  .buddy-tab-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .buddy-tab-btn.active {
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .buddy-tab-btn:hover:not(.active) {
+    color: #4b5563;
+  }
+
+  .buddy-tab-content {
+    padding: 0 24px 24px;
+  }
+
+  .buddy-tab-pane {
+    display: none;
+  }
+
+  .buddy-tab-pane.active {
+    display: block;
+  }
+
+  .buddy-selection-grid {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .buddy-placeholder {
+    color: #9ca3af;
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+  }
+
+  /* Character Grid */
+  .buddy-character-grid {
+    padding: 16px 0;
+  }
+
+  /* Character items inherit from utility classes */
+
+  .buddy-character-item:hover {
+    background: #e3f2fd;
+    transform: scale(1.05);
+    border-color: #bbdefb;
+  }
+
+  .buddy-character-item.selected {
+    border-color: #2196F3;
+    background: #e3f2fd;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  }
+
+  .buddy-character-emoji {
+    font-size: 32px;
+    margin-bottom: 4px;
+    user-select: none;
+  }
+
+  .buddy-character-name {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    text-align: center;
+    user-select: none;
+  }
+
+  .buddy-character-item.selected .buddy-character-name {
+    color: #2196F3;
+    font-weight: 600;
+  }
+
+  /* Avatar Emoji Display */
+  .buddy-avatar-emoji-display {
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .buddy-avatar-emoji-display:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Accessory Grid */
+  .buddy-accessory-grid {
+    padding: 16px 0;
+  }
+
+  .buddy-accessory-item {
+    position: relative;
+  }
+
+  .buddy-accessory-item:hover {
+    background: #e8f5e8;
+    transform: scale(1.05);
+    border-color: #a5d6a7;
+  }
+
+  .buddy-accessory-item.active {
+    border-color: #4CAF50;
+    background: #e8f5e8;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  }
+
+  .buddy-accessory-item.active::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .buddy-accessory-emoji {
+    font-size: 32px;
+    margin-bottom: 4px;
+    user-select: none;
+  }
+
+  .buddy-accessory-name {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    text-align: center;
+    user-select: none;
+  }
+
+  .buddy-accessory-item.active .buddy-accessory-name {
+    color: #4CAF50;
+    font-weight: 600;
+  }
+
+  .buddy-modal-footer {
+    padding: 0 24px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .buddy-done-btn {
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .buddy-done-btn:hover {
+    background: #1976D2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 480px) {
+    .buddy-modal-container {
+      max-width: 95vw;
+      max-height: 85vh;
+    }
+    
+    .buddy-avatar-preview,
+    .buddy-tab-container,
+    .buddy-tab-content,
+    .buddy-modal-footer {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    
+    .buddy-preview-avatar {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .buddy-preview-img {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .buddy-character-grid {
+      gap: 8px;
+      padding: 12px 0;
+    }
+    
+    .buddy-character-item {
+      padding: 8px 4px;
+    }
+    
+    .buddy-character-emoji {
+      font-size: 24px;
+    }
+    
+    .buddy-character-name {
+      font-size: 10px;
+    }
+    
+    .buddy-accessory-grid {
+      gap: 8px;
+      padding: 12px 0;
+    }
+    
+    .buddy-accessory-item {
+      padding: 8px 4px;
+    }
+    
+    .buddy-accessory-emoji {
+      font-size: 24px;
+    }
+    
+    .buddy-accessory-name {
+      font-size: 10px;
+    }
+    
+    .buddy-accessory-item.active::after {
+      width: 14px;
+      height: 14px;
+      font-size: 8px;
+      top: 2px;
+      right: 2px;
+    }
+  }
+  
