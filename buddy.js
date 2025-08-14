@@ -27,8 +27,70 @@ document.addEventListener('DOMContentLoaded', function() {
     
     //  ----------------- BEGIN KATHERINE CODE  -----------------
     
-    
+    // Chatbot send button for text input
+    const btn = document.getElementById('buddy-send');
+    if (!btn) return console.error('[Buddy] send button missing');
+    btn.addEventListener('click', sendToBuddy);
 
+    // Chatbot mic button for voice input
+    const micBtn  = document.getElementById('buddy-mic');
+    const inputEl = document.getElementById('buddy-input');
+    const out = document.getElementById('buddy-response');
+
+    if (micBtn && recognizer) {
+        // micBtn.addEventListener('pointerdown', () => {
+        //     recognizer.start();
+        //     console.log('[Buddy] recognizer.start()'); // tell me when the recognizer starts
+        // });
+        // micBtn.addEventListener('pointerup',    () => recognizer.stop());
+        // micBtn.addEventListener('pointerleave', () => recognizer.stop());
+
+        try {
+            recognizer.start();            // ask for mic permission & start listening
+            console.log('[Buddy] recognizer.start() — hands-free mode');
+            out.innerText = '🎤 Listening…';
+        } catch (err) {
+            // Chrome throws InvalidStateError if start is called while already active
+            console.warn('[Buddy] recognizer already active', err);
+        }
+
+        let lastTranscript = '';
+
+        recognizer.addEventListener('result', ev => {
+        const res = ev.results[ev.resultIndex];
+        if (!res.isFinal) return;
+
+        const transcript = res[0].transcript.trim();
+        if (!transcript || transcript === lastTranscript) return;
+        console.log('[Buddy] Transcript:', transcript); // print out the transcript
+        if (out) out.innerText = `🗣 You said: "${transcript}"`;
+
+        lastTranscript = transcript;
+        inputEl.value  = transcript;
+        sendToBuddy();
+        });
+
+        recognizer.addEventListener('end', () => {
+        console.log('[Buddy] recognizer ended — restarting');
+        try { recognizer.start(); } catch (_) { /* ignore double-starts */ }
+        });
+        
+        micBtn.addEventListener('click', () => {
+            recognizer.start();
+            console.log('[Buddy] recognizer.start()');
+            out.innerText = '🎤 Listening…';
+        });
+
+        recognizer.addEventListener('speechend', () => {
+            console.log('[Buddy] speechend — stopping recognizer');
+            recognizer.stop();
+        });
+        
+        //Tell me if there's an error
+        recognizer.addEventListener('error', (e) =>
+            console.error('[Buddy] recognizer error:', e.error)
+        );
+    }
 
     // ----------------- END KATHERINE CODE  -----------------
     
